@@ -7,11 +7,26 @@ import random
 import scipy as sp
 from scipy.stats import entropy
 
-# Implementation based on Medium article by Oliver K. Ernst, PhD
-# https://medium.com/practical-coding/the-simplest-generative-model-you-probably-missed-c840d68b704
+# Principal Component Analysis (PCA) based on Medium article by Oliver K. Ernst, PhD
+# Source: https://medium.com/practical-coding/the-simplest-generative-model-you-probably-missed-c840d68b704
+
 class PPCA:
+    """
+    Probabilistic Principal Component Analysis (PPCA) implementation.
+
+    Attributes:
+        q (int): Number of principal components.
+        data (numpy.ndarray): Input data matrix.
+    """
     
     def __init__(self, q, data):
+        """
+        Initialize PPCA with the number of principal components and input data.
+
+        Args:
+            q (int): Number of principal components.
+            data (numpy.ndarray): Input data matrix.
+        """
         self.q = q
         self.data = data
         
@@ -22,7 +37,18 @@ class PPCA:
         var_ml : float,
         visible_samples : np.array
         ) -> np.array:
+        """
+        Sample hidden variables given visible variables.
 
+        Args:
+            weight_ml (numpy.ndarray): Weight matrix.
+            mu_ml (numpy.ndarray): Mean vector.
+            var_ml (float): Variance.
+            visible_samples (numpy.ndarray): Visible samples.
+
+        Returns:
+            numpy.ndarray: Sampled hidden variables.
+        """
         
         m = np.transpose(weight_ml) @ weight_ml + var_ml * np.eye(self.q)
 
@@ -42,6 +68,18 @@ class PPCA:
         var_ml : float,
         hidden_samples : np.array
         ) -> np.array:
+        """
+        Sample visible variables given hidden variables.
+
+        Args:
+            weight_ml (numpy.ndarray): Weight matrix.
+            mu_ml (numpy.ndarray): Mean vector.
+            var_ml (float): Variance.
+            hidden_samples (numpy.ndarray): Hidden samples.
+
+        Returns:
+            numpy.ndarray: Sampled visible variables.
+        """
 
         d = weight_ml.shape[0]
 
@@ -54,15 +92,21 @@ class PPCA:
     
         return np.array(act_visible)
     
-    def generate_data(self):
-        d = self.data.shape[1]
+    def generate(self, no_samples):
+        """
+        Generate synthetic data using PPCA.
 
+        Args:
+            no_samples (int): Number of synthetic samples to generate.
+
+        Returns:
+            numpy.ndarray: Synthetic data matrix.
+        """
+        d = self.data.shape[1]
 
         mu_ml = np.mean(self.data,axis=0)
 
-
         data_cov = np.cov(self.data,rowvar=False)
-        # Variance
         lambdas, eigenvecs = np.linalg.eig(data_cov)
         idx = lambdas.argsort()[::-1]   
         lambdas = lambdas[idx]
@@ -70,11 +114,7 @@ class PPCA:
 
         var_ml = (1.0 / (d-self.q)) * sum([lambdas[j] for j in range(self.q,d)])
 
-
-        # Weight matrix
         uq = eigenvecs[:,:self.q]
-
-
         lambdaq = np.diag(lambdas[:self.q])
 
         weight_ml = uq @ np.sqrt(lambdaq - var_ml * np.eye(self.q))
@@ -89,7 +129,6 @@ class PPCA:
         mean_hidden = np.full(self.q,0)
         cov_hidden = np.eye(self.q)
 
-        no_samples = len(self.data)
         samples_hidden = np.random.multivariate_normal(mean_hidden,cov_hidden,size=no_samples)
         
         synthetic_data = self.sample_visible_given_hidden(

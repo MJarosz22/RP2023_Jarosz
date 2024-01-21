@@ -3,8 +3,17 @@ from torch import nn
 import torch.distributions as dist
 import numpy as np
 
+def kl_div(true, synthetic):
+    """
+    Compute the Kullback-Leibler (KL) Divergence between two multivariate normal distributions.
 
-def kl_div(true, synthetic): 
+    Args:
+        true (numpy.ndarray): True data samples.
+        synthetic (numpy.ndarray): Synthetic data samples.
+
+    Returns:
+        torch.Tensor: KL Divergence between the true and synthetic distributions.
+    """
     true_data_mean = true.mean(axis=0)
     model_mean = synthetic.mean(axis=0)
     true_data_covariance = np.cov(true, rowvar=False)
@@ -28,3 +37,4 @@ def kl_div(true, synthetic):
     kl_divergence = dist.kl.kl_divergence(true_distribution, estimated_distribution)
     
     return kl_divergence.detach()
+
