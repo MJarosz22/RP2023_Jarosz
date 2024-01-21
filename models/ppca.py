@@ -54,7 +54,7 @@ class PPCA:
     
         return np.array(act_visible)
     
-    def generate_data(self):
+    def generate(self, no_samples):
         d = self.data.shape[1]
 
 
@@ -89,7 +89,6 @@ class PPCA:
         mean_hidden = np.full(self.q,0)
         cov_hidden = np.eye(self.q)
 
-        no_samples = len(self.data)
         samples_hidden = np.random.multivariate_normal(mean_hidden,cov_hidden,size=no_samples)
         
         synthetic_data = self.sample_visible_given_hidden(

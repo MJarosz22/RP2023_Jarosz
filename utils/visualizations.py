@@ -2,9 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
 
+from sklearn.decomposition import PCA
+
 def visualize_data(real_data, synthetic_data, feature_1, feature_2, color_real='blue', color_synthetic='yellow'):
-    plt.plot(real_data[:, feature_1], synthetic_data[:, feature_2], ".", color=color_real)
-    plt.plot(synthetic_data[:, feature_1], generated_samples[:, feature_2], ".", color=color_synthetic)
+    plt.plot(real_data[:, feature_1], real_data[:, feature_2], ".", color=color_real)
+    plt.plot(synthetic_data[:, feature_1], synthetic_data[:, feature_2], ".", color=color_synthetic)
     plt.legend(['Real data', 'Synthetic data'])
     plt.xlabel(f"Feature {feature_1}")
     plt.ylabel(f"Feature {feature_2}")
@@ -35,7 +37,7 @@ def visualize_across_epochs(real_data, synthetic_across_epochs, feature_1, featu
     plt.show()
 
 
-def visalize_pca(real_data, synthetic_data, color_real='blue', color_synthetic='yellow'):
+def visualize_pca(real_data, synthetic_data, color_real='blue', color_synthetic='yellow'):
     pca_real = PCA(n_components=2)
     real_result = pca_real.fit_transform(real_data)
     
